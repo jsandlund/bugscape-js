@@ -3,14 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <title>Effective JavaScript: Frogger</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-GHW2S7IZAQe8+YkyL99LyDj1zdWXSPOG+JZafCtKiSc= sha512-vxM32w6T7zJ83xOQ6FT4CEFnlasqmkcB0+ojgbI0N6ZtSxYvHmT7sX2icN07TqEqr5wdKwoLkmB8sAsGAjCJHg==" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
-<body>
+<body class="">
 
-    <h1>Game Score: <span id="elScore"> 0 </span> </h1>
+  <div id="site-wrapper" class="vertical-center">
+  <div class="container">
 
+    <!-- View 1 - New Game -->
+    <div id="view-createGame" class="row">
+    <div class="col-md-6 col-md-offset-3">
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"> <i class="fa fa-bug"></i> Bugscape JS</h2>
+          <ul class="list-inline text-center">
+            <li> <i class="fa fa-question-circle"></i> How to Play </li>
+            <li> <i class="fa fa-users"></i> Leaderboard  </li>
+          </ul>
+        </div>
+
+        <div class="card-block form-create-game">
+          <form id="createGame">
+            <fieldset class="form-group">
+              <label for="username">Username</label>
+              <input name="username" type="input" class="form-control" id="username" placeholder="Enter username" required="">
+            </fieldset>
+            <fieldset class="form-group">
+              <label for="difficulty">Game Difficulty</label>
+              <select name="difficulty" class="form-control" id="difficulty">
+                <option>easy</option>
+                <option>medium</option>
+                <option>hard</option>
+              </select>
+            </fieldset>
+            <button type="submit" class="btn btn-success-outline btn-block">Let's Do This!</button>
+          </form>
+        </div>
+      </div>
+  </div>
+  </div>
+
+  <!-- View 2 - Play Game -->
+  <div id="view-playGame" class="row hidden-xs-up">
+  <div class="col-md-6 col-md-offset-3">
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-bug logo"></i>
+        <ul class='list-inline text-center'>
+          <li><i class="fa fa-clock-o"></i> 1:00 <small> to go </small> </li>
+          <li><i class="fa fa-heart"></i> <span id="elLives"> 5 </span> <small> lives </small> </li>
+          <li><i class="fa fa-star"></i> <span id="elScore"> 0 </span> <small> points </small>  </li>
+        </ul>
+      </div>
+
+      <div class="card-block">
+        <div id="game-container"></div> <!-- game loads here -->
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- View 3 - End Game -->
+  <div id="view-endGame" class="row hidden-xs-up">
+  <div class="col-md-6 col-md-offset-3">
+
+    <div class="card">
+
+      <div class="card-header">
+        <i class="fa fa-bug logo"></i>
+        <h2 class="card-title">Game over</h2>
+      </div>
+
+      <div id="end-game-msg" class="card-block">
+          <p>You scored 10 points in 60 seconds. </p>
+      </div>
+
+      <div id="leaderboards" class="card-block">
+          <div class="row">
+            <div class="col-md-4">
+              <h3> Easy </h3>
+              <ol>
+                <li>Jon Doe</li>
+                <li> Tim Sandlund </li>
+                <li> Emily Sandlund</li>
+                <li> Elie Homage</li>
+                <li> Jonathan Merriot</li>
+              </ol>
+            </div>
+            <div class="col-md-4">
+              <h3> Medium </h3>
+              <ol>
+                <li>Jon Doe</li>
+                <li> Tim Sandlund </li>
+                <li> Emily Sandlund</li>
+                <li> Elie Homage</li>
+                <li> Jonathan Merriot</li>
+              </ol>
+            </div>
+            <div class="col-md-4">
+              <h3> Hard </h3>
+              <ol>
+                <li>Jon Doe</li>
+                <li> Tim Sandlund </li>
+                <li> Emily Sandlund</li>
+                <li> Elie Homage</li>
+                <li> Jonathan Merriot</li>
+              </ol>
+            </div>
+          </div>
+
+
+          </ul>
+      </div>
+
+      <div class="card-block form-end-game">
+        <form>
+          <button type="submit" class="btn btn-block">Let's Play Again!</button>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+  </div>
+
+</div>
+</div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha/js/bootstrap.min.js" integrity="sha256-+h0g0j7qusP72OZaLPCSZ5wjZLnoUUicoxbvrl14WxM= sha512-0z9zJIjxQaDVzlysxlaqkZ8L9jh8jZ2d54F3Dn36Y0a8C6eI/RFOME/tLCFJ42hfOxdclfa29lPSNCmX5ekxnw==" crossorigin="anonymous"></script>
     <script src="js/resources.js"></script>
     <script src="js/app.js"></script>
     <script src="js/engine.js"></script>
+
 </body>
 </html>

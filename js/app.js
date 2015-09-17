@@ -3,27 +3,86 @@ var Game = {
   "width": 505,
   "height": 606,
   "score": 0,
-  "winningScore": 10,
-  "numEnemies": 4,
-  "scoreChange": function(pointChange){
-    var elScore = document.getElementById("elScore");
-    this.score = this.score + pointChange
-    elScore.innerHTML = this.score;
-    if(pointChange > 0) {
-      console.log("Winner! 1 point! Your score is now: " + this.score)
-    } else {
-      console.log("Ouch! You lose a point! Your score is now: " + this.score)
+  "difficultySettings": {
+    "easy": {
+      "numEnemies": 4,
+      "enemySpeedMultiplier": 1,
+      "oddsOfSuperEnemy": .05,
+      "playerLives": 10
+    },
+    "medium": {
+      "numEnemies": 7,
+      "enemySpeedMultiplier": 2,
+      "oddsOfSuperEnemy": .10,
+      "playerLives": 5
+    },
+    "hard": {
+      "numEnemies": 10,
+      "enemySpeedMultiplier": 3,
+      "oddsOfSuperEnemy": .20,
+      "playerLives": 2
     }
-    player.resetPosition();
+  },
+  "difficulty": "easy",
+  "state": "state_createGame",
+  "initStateFunctions": {
+    "state_createGame": function(){
+      // handle form submissions
+      $("#createGame").submit(function(e) {
+        // get username and difficulty
+        var form = this;
+        e.preventDefault();
+        player.username = form.username.value;
+        Game.difficulty = form.difficulty.value;
+        // start game
+        Game.changeState("state_playGame");
+      })
+    },
+    "state_playGame": function(){
+
+      // Instantiate Enemy objects, place in global allEnemies array
+      for (var i = 0; i < Game.difficultySettings[Game.difficulty].numEnemies; i++) {
+        allEnemies.push(new Enemy());
+      }
+
+      // Initiate Player
+      player.initiate();
+
+      // hide View1, update View2, show view2
+      $("#view-createGame").toggleClass("hidden-xs-up");
+      $("#elLives").text(player.lives);
+      $("#view-playGame").toggleClass("hidden-xs-up");
+
+      // start GameEngine
+      Engine(window);
+
+
+    },
+    "state_endGame": function(){
+      // stop game engine
+      // write score to localStorage
+      // populate leaderboard
+    }
+  },
+  "changeState": function(newState){
+    this.initStateFunctions[newState]();
   },
   "displayScore": function() {
     console.log("Your score is now: " + this.score)
+  },
+  "updateScore": function(pointChange){
+    var elScore = document.getElementById("elScore");
+    this.score = this.score + pointChange
+    elScore.innerHTML = this.score;
+    player.resetPosition();
   },
   "checkCollisions": function(){
     // iterate through all Enemy objects. If location of any is within 25px of a Player object, trigger collission event
     for (var i = 0; i < allEnemies.length; i++) {
       if( Math.abs(player.y - allEnemies[i].y) < 25 && Math.abs(player.x - allEnemies[i].x) < 25) {
-        this.scoreChange(-1);
+        this.updateScore(-1);
+        player.updateLives(-1);
+        player.resetPosition();
       }
     }
   }
@@ -75,10 +134,16 @@ var Player = function() {
   this.y = 385;
   this.moveY = 85;
   this.moveX = 100;
+  this.points = 0;
 }
 
 Player.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+}
+
+Player.prototype.updateLives = function(livesChange){
+  this.lives = this.lives + livesChange;
+  $("#elLives").text(this.lives);
 }
 
 Player.prototype.handleInput = function(keyPressed) {
@@ -92,11 +157,11 @@ Player.prototype.handleInput = function(keyPressed) {
       break;
     case "up":
       if(this.y === 45) {
-        Game.scoreChange(1);
+        Game.updateScore(1);
       } else { this.y = this.y - this.moveY};
       break;
     case "down":
-      if(this.y > 385) {this.y = this.y + this.moveY};
+      if(this.y < 385) {this.y = this.y + this.moveY};
       break;
   }
 
@@ -104,8 +169,13 @@ Player.prototype.handleInput = function(keyPressed) {
 
 }
 
-Player.prototype.update = function(dt) {
+Player.prototype.initiate = function() {
+  // set lives
+  this.lives = Game.difficultySettings[Game.difficulty].playerLives;
+  console.log(this.username + " has " + this.lives + " lives!");
+}
 
+Player.prototype.update = function(dt) {
 }
 
 Player.prototype.resetPosition = function(){
@@ -114,12 +184,8 @@ Player.prototype.resetPosition = function(){
 }
 
 
-// Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
-for(var i = 0; i < Game.numEnemies; i++) {
-  allEnemies.push(new Enemy());
-}
 
 // Place the player object in a variable called player
 var player = new Player();
@@ -136,3 +202,6 @@ document.addEventListener('keyup', function(e) {
     };
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+// Initate first State
+Game.changeState(Game.state);
