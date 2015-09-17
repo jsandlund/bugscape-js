@@ -1,5 +1,10 @@
+/* prevent window scrolling behavior */
+html, body {
+  overflow: hidden;
+ }
+
 #site-wrapper {
-  padding:10% 0%
+  padding:5% 0%
 }
 
 /* center canvas element */
@@ -8,6 +13,7 @@ canvas {
     padding-right: 0;
     margin-left: auto;
     margin-right: auto;
+    margin-top:-50px;
     display: block;
     width: 505px;
 }
