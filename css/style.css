@@ -21,3 +21,10 @@ canvas {
 .card-title {
   text-align: center;
 }
+
+
+/* Leaderboard Styles */
+
+.leaderboard-score{
+  font-weight:600;
+}

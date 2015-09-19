@@ -25,9 +25,70 @@ var Game = {
       "playerLives": 2
     }
   },
+  "leaderboards": {
+    "easy": [
+      ["Tim", 10],
+      ["Stephen", 20],
+      ["Emily", 15]
+    ],
+    "medium": [
+      ["Eleanor", 75],
+      ["Jenny", 15],
+      ["Sarah", 55]
+    ],
+    "hard": [
+      ["Jonny 1", 100],
+      ["Jonny 3", 75],
+      ["Jonny 2", 90]
+    ]
+  },
+  "handleLeaderboards": function(){
+    // push new score to correct leaderboard
+    var username = player.username,
+        newEntry = [username, this.score],
+        leaderboards = this.leaderboards,
+        difficulty = this.difficulty,
+        elLeaderboards = document.getElementById('leaderboards-container'),
+        maxLeaderboardEntries = 2;
+
+    leaderboards[difficulty].push(newEntry);
+
+    // then sort leaderboard arrays by score
+    // then write iterate over leaderboards and write to HTML
+    for (board in leaderboards) {
+      var currentBoard = leaderboards[board];
+
+      // sort current leadeboard
+      currentBoard.sort(function (a, b){
+        return b[1] - a[1];
+      });
+
+      // create <ol> list for each leaderboard
+      elLeaderboards.innerHTML +=
+        '<div class="col-md-4">' +
+          '<h3 class="text-center">' + board + '</h3>' +
+          '<ol id="board-' + board + '">' + '</ol>'
+        '</div>'
+
+      var numLeaderboardEntries;
+      if (currentBoard.length < maxLeaderboardEntries) {
+        numLeaderboardEntries = currentBoard.length;
+      } else { numLeaderboardEntries = maxLeaderboardEntries }
+
+      // append username, score pairs to each leaderboard list
+      for (var i = 0; i < numLeaderboardEntries; i++) {
+        var entry = currentBoard[i];
+        var elSingleBoard = document.getElementById("board-" + board);
+        elSingleBoard.innerHTML +=
+          '<li>' +
+            '<span class="leaderboard-score">' + entry[1] + '</span>' + ' ' + '<span class="leaderboard-username">' + entry[0] + '</span>' +
+          '</li>';
+      }
+    }
+  },
   "difficulty": "easy",
   "state": "state_createGame",
-  "gameTimer": new Timer(5, 1000, "elTime"), // length of timer, ms interval, ID of element to update
+  "gameTimer": new Timer(1, 1000, "elTime"), // length of timer, ms interval, ID of element to update
   "initStateFunctions": {
     "state_createGame": function(){
       // handle form submissions
@@ -63,10 +124,20 @@ var Game = {
 
     },
     "state_endGame": function(){
+      var msg,
+          elMsg;
+
+      // update leaderboards
+      Game.handleLeaderboards();
+
+      // hide view2, show view3
       $("#view-playGame").toggleClass("hidden-xs-up");
-      alert("GAME OVER!")
-      // write score to localStorage
-      // populate leaderboard
+      $("#view-endGame").toggleClass("hidden-xs-up");
+
+      // create end game message, write to html
+      msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>'
+      elMsg = document.getElementById('endGameMsg')
+      elMsg.innerHTML = msg;
     }
   },
   "changeState": function(newState){
