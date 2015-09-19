@@ -80,8 +80,12 @@ var Engine = function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
+      // Render game while game state is state_playGame
+      // QUESTION: Why doesn't a while loop work here?
+      if(Game.state === 'state_playGame') {
         updateEntities(dt);
         Game.checkCollisions();
+      }
     }
 
     /* This is called by the update function  and loops through all of the
@@ -162,7 +166,6 @@ var Engine = function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
     }
 
     /* Go ahead and load all of the images we know we're going to need to

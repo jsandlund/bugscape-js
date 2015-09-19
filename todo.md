@@ -1,5 +1,5 @@
 1. Set up game states: createGame, playGame, endGame
-  - state_createGame
+  <!-- - state_createGame
     - show createGame card
     - Input username
     - Select difficulty
@@ -8,22 +8,20 @@
     - start game engine
       - scoring of points
       - collission events
-      - lives
+      - lives -->
       - timer
+        - game should end when time is up OR lives = 0
   - state_endGame
     - stop game engine
     - hide playGame state
+    - show end game modal
 
 
-
-2. Set up countdown timer, lifeCounter, pointsCounter
-  - game should end when time is up OR lives = 0
-
-3. Set up leaderboard
+2. Set up leaderboard
   - Design data model for saving scores and names by difficulty level
   - On game end, save name and score to localStorage
   - Sort localStorage and print top 10 to leaderboards for each difficulty
 
-4. Test for bugs
+3. Test for bugs
 
-5. FINISH!
+4. FINISH!

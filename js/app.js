@@ -3,6 +3,8 @@ var Game = {
   "width": 505,
   "height": 606,
   "score": 0,
+  "timeUp": false,
+  "livesOut": false,
   "difficultySettings": {
     "easy": {
       "numEnemies": 4,
@@ -25,6 +27,7 @@ var Game = {
   },
   "difficulty": "easy",
   "state": "state_createGame",
+  "gameTimer": new Timer(5, 1000, "elTime"), // length of timer, ms interval, ID of element to update
   "initStateFunctions": {
     "state_createGame": function(){
       // handle form submissions
@@ -53,19 +56,23 @@ var Game = {
       $("#elLives").text(player.lives);
       $("#view-playGame").toggleClass("hidden-xs-up");
 
+      // Start game timer. [QUESTION]: is there a way to refernce the Game object by climbing the `this` chain? Using just this references the `initStateFunctions`
+      Game.gameTimer.run();
       // start GameEngine
       Engine(window);
 
-
     },
     "state_endGame": function(){
-      // stop game engine
+      $("#view-playGame").toggleClass("hidden-xs-up");
+      alert("GAME OVER!")
       // write score to localStorage
       // populate leaderboard
     }
   },
   "changeState": function(newState){
+    console.log("State changed to: ", newState);
     this.initStateFunctions[newState]();
+    this.state = newState;
   },
   "displayScore": function() {
     console.log("Your score is now: " + this.score)
@@ -81,10 +88,17 @@ var Game = {
     for (var i = 0; i < allEnemies.length; i++) {
       if( Math.abs(player.y - allEnemies[i].y) < 25 && Math.abs(player.x - allEnemies[i].x) < 25) {
         this.updateScore(-1);
-        player.updateLives(-1);
+        if (player.lives > 0) {
+          player.updateLives(-1);
+        } else {
+          Game.changeState('state_endGame');
+        };
         player.resetPosition();
       }
     }
+  },
+  "isGameOver": function(){
+    if (this.timeUp || this.livesOut) {return true} else { return false};
   }
 }
 
@@ -205,3 +219,32 @@ document.addEventListener('keyup', function(e) {
 
 // Initate first State
 Game.changeState(Game.state);
+
+// Timer constructor function. Used to set gameTime
+// Hat tip to Steve Harrison who's SO answer helped me understand why in the world the execution context, and consequent reference to `this`,
+// changed when calling the setInterval function. http://stackoverflow.com/questions/1101668/how-to-use-settimeout-to-invoke-object-itself
+
+function Timer(secs, msInterval, elemToUpdate){
+  this.secs = secs;
+  this.msInterval = msInterval;
+  this.elemToUpdate = elemToUpdate;
+  this.run = function(){
+    var element = document.getElementById(this.elemToUpdate);
+    element.innerHTML = this.secs;
+
+    // set `this` to local scope variable to prevent setInterval from referencing global window object.
+    var scope = this
+    var timer = setInterval(updateTimer, this.msInterval, this.element, scope)
+
+    function updateTimer(){
+      element.innerHTML = scope.secs;
+      if (scope.secs < 1) {
+        // stop setInterval
+        clearTimeout(timer);
+        // change to game over state
+        Game.changeState('state_endGame');
+      }
+      scope.secs--;
+    }
+  }
+}
