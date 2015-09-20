@@ -1,4 +1,4 @@
-1. Set up game states: createGame, playGame, endGame
+<!-- 1. Set up game states: createGame, playGame, endGame -->
   <!-- - state_createGame
     - show createGame card
     - Input username
@@ -9,19 +9,39 @@
       - scoring of points
       - collission events
       - lives -->
-      - timer
-        - game should end when time is up OR lives = 0
-  - state_endGame
+      <!-- - timer
+        - refactor timer into prototype
+        - game should end when time is up OR lives = 0 -->
+  <!-- - state_endGame
     - stop game engine
     - hide playGame state
-    - show end game modal
+    - show end game modal -->
+
+<!-- 2. Set up leaderboard
+  - Design data model for saving scores and names by difficulty level -->
 
 
-2. Set up leaderboard
-  - Design data model for saving scores and names by difficulty level
-  - On game end, save name and score to localStorage
-  - Sort localStorage and print top 10 to leaderboards for each difficulty
+- Set up firebase
+  - tutorials
+    - https://www.codecademy.com/en/tracks/firebase
+    - https://www.airpair.com/firebase/posts/firebase-building-realtime-app
+    - http://thejackalofjavascript.com/getting-started-with-firebase/
+    - https://www.firebase.com/tutorial/#session/f5ivinhiynt  
+    - http://time2hack.com/2015/03/intro-to-firebase-with-javascript-and-jquery.html
+    - https://www.firebase.com/blog/2014-04-28-best-practices-arrays-in-firebase.html
+  - Save new scores to firebase
+  - Call scores from firebase
 
-3. Test for bugs
 
-4. FINISH!
+- Finish setting up game difficulty variables
+  - Set up superbug
+
+- Add game instructions
+
+- CSS CSS CSS. Make this baby look sexy!
+  - New header font
+  - Background color
+
+- Code review. Clean up loose ends.  
+
+- Submit.

@@ -46,12 +46,20 @@ var Game = {
     // push new score to correct leaderboard
     var username = player.username,
         newEntry = [username, this.score],
+        score = this.score,
         leaderboards = this.leaderboards,
         difficulty = this.difficulty,
         elLeaderboards = document.getElementById('leaderboards-container'),
         maxLeaderboardEntries = 2;
 
     leaderboards[difficulty].push(newEntry);
+
+    // Push username, difficulty and score to firbase db
+    playersRef.push({
+      "username": username,
+      "score": score,
+      "difficulty": difficulty
+    });
 
     // then sort leaderboard arrays by score
     // then write iterate over leaderboards and write to HTML
@@ -88,7 +96,7 @@ var Game = {
   },
   "difficulty": "easy",
   "state": "state_createGame",
-  "gameTimer": new Timer(1, 1000, "elTime"), // length of timer, ms interval, ID of element to update
+  "gameTimer": new Timer(5, 1000, "elTime"), // length of timer, ms interval, ID of element to update
   "initStateFunctions": {
     "state_createGame": function(){
       // handle form submissions
@@ -319,3 +327,10 @@ function Timer(secs, msInterval, elemToUpdate){
     }
   }
 }
+
+
+// FIREBASE TESTS
+var bugscapeRef = new Firebase('https://bugscape-js.firebaseio.com/');
+
+// Create ref to players object
+var playersRef = new Firebase('https://bugscape-js.firebaseio.com/players')
