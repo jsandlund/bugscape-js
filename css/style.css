@@ -1,8 +1,3 @@
-/* prevent window scrolling behavior */
-html, body {
-  overflow: hidden;
- }
-
 #site-wrapper {
   padding:5% 0%
 }

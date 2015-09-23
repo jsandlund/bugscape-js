@@ -5,6 +5,7 @@ var Game = {
   "score": 0,
   "timeUp": false,
   "livesOut": false,
+  "playersRef": {},
   "difficultySettings": {
     "easy": {
       "numEnemies": 4,
@@ -25,74 +26,72 @@ var Game = {
       "playerLives": 2
     }
   },
-  "leaderboards": {
-    "easy": [
-      ["Tim", 10],
-      ["Stephen", 20],
-      ["Emily", 15]
-    ],
-    "medium": [
-      ["Eleanor", 75],
-      ["Jenny", 15],
-      ["Sarah", 55]
-    ],
-    "hard": [
-      ["Jonny 1", 100],
-      ["Jonny 3", 75],
-      ["Jonny 2", 90]
-    ]
+  "leaderboardsArray": [], // to hold all players in a nested array [difficulty, score, username]
+  "getScoresFromFirebase": function(){
+
+    // Call on game load, so there is no delay when leaderboards are populated.
+    Game.playersRef = new Firebase('https://bugscape-js.firebaseio.com/players');
+
+    // get sorted scores from Firebase.
+    Game.playersRef.orderByChild("score").on("child_added", function(snapshot){
+      var result = snapshot.val();
+      Game.leaderboardsArray.push([result.difficulty, result.score, result.username]);
+      console.log("new player added to firebase");
+    });
+
   },
-  "handleLeaderboards": function(){
-    // push new score to correct leaderboard
+  "addNewScore": function(){
+
+    console.log("new player added to local variable");
+
+    // Add score to local array
+    Game.leaderboardsArray.push([this.difficulty, this.score, player.username]);
+
+    // Sort scores
+    Game.leaderboardsArray.sort(function(a,b){
+      return b[1] - a[1];
+    });
+
+    console.log("sorted games array", Game.leaderboardsArray);
+
+    // Don't call prior to game ending state; otherwise, properties will not be populated.
+    // Add score to firebase
+    Game.playersRef.push({
+      "username": player.username,
+      "score": this.score,
+      "difficulty": this.difficulty
+    });
+  },
+  "buildLeaderboardsHTML": function(){
     var username = player.username,
-        newEntry = [username, this.score],
         score = this.score,
+        newEntry = [username, score],
         leaderboards = this.leaderboards,
         difficulty = this.difficulty,
         elLeaderboards = document.getElementById('leaderboards-container'),
-        maxLeaderboardEntries = 2;
+        maxLeaderboardEntries = 2
 
-    leaderboards[difficulty].push(newEntry);
-
-    // Push username, difficulty and score to firbase db
-    playersRef.push({
-      "username": username,
-      "score": score,
-      "difficulty": difficulty
-    });
-
-    // then sort leaderboard arrays by score
-    // then write iterate over leaderboards and write to HTML
-    for (board in leaderboards) {
-      var currentBoard = leaderboards[board];
-
-      // sort current leadeboard
-      currentBoard.sort(function (a, b){
-        return b[1] - a[1];
-      });
-
-      // create <ol> list for each leaderboard
+    // Build <ol> for each difficulty level
+    for (difficulty in Game.difficultySettings) {
       elLeaderboards.innerHTML +=
         '<div class="col-md-4">' +
-          '<h3 class="text-center">' + board + '</h3>' +
-          '<ol id="board-' + board + '">' + '</ol>'
+          '<h3 class="text-center">' + difficulty + '</h3>' +
+          '<ol id="board-' + difficulty + '">' + '</ol>' +
         '</div>'
+    };
 
-      var numLeaderboardEntries;
-      if (currentBoard.length < maxLeaderboardEntries) {
-        numLeaderboardEntries = currentBoard.length;
-      } else { numLeaderboardEntries = maxLeaderboardEntries }
-
-      // append username, score pairs to each leaderboard list
-      for (var i = 0; i < numLeaderboardEntries; i++) {
-        var entry = currentBoard[i];
-        var elSingleBoard = document.getElementById("board-" + board);
-        elSingleBoard.innerHTML +=
+    // append players <ol>'
+    for (var i = 0; i < Game.leaderboardsArray.length; i++){
+      var _player = Game.leaderboardsArray[i],
+          playerDifficulty = _player[0],
+          playerScore = _player[1],
+          playerUsername = _player[2],
+          playerEntryHTML =
           '<li>' +
-            '<span class="leaderboard-score">' + entry[1] + '</span>' + ' ' + '<span class="leaderboard-username">' + entry[0] + '</span>' +
+            '<span class="leaderboard-score">' + playerScore + '</span>' + ' ' + '<span class="leaderboard-username">' + playerUsername + '</span>' +
           '</li>';
-      }
-    }
+        document.getElementById("board-" + playerDifficulty).innerHTML += playerEntryHTML
+    };
   },
   "difficulty": "easy",
   "state": "state_createGame",
@@ -109,6 +108,9 @@ var Game = {
         // start game
         Game.changeState("state_playGame");
       })
+
+      // Get scores from firebase
+      Game.getScoresFromFirebase();
     },
     "state_playGame": function(){
 
@@ -135,8 +137,11 @@ var Game = {
       var msg,
           elMsg;
 
-      // update leaderboards
-      Game.handleLeaderboards();
+      // Add new score to DB
+      Game.addNewScore();
+
+      // Write scores to HTML
+      Game.buildLeaderboardsHTML();
 
       // hide view2, show view3
       $("#view-playGame").toggleClass("hidden-xs-up");
@@ -257,9 +262,6 @@ Player.prototype.handleInput = function(keyPressed) {
       if(this.y < 385) {this.y = this.y + this.moveY};
       break;
   }
-
-  console.log("x: " + this.x, "y: " + this.y)
-
 }
 
 Player.prototype.initiate = function() {
@@ -327,10 +329,3 @@ function Timer(secs, msInterval, elemToUpdate){
     }
   }
 }
-
-
-// FIREBASE TESTS
-var bugscapeRef = new Firebase('https://bugscape-js.firebaseio.com/');
-
-// Create ref to players object
-var playersRef = new Firebase('https://bugscape-js.firebaseio.com/players')

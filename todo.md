@@ -22,19 +22,31 @@
 
 
 - Set up firebase
-  - tutorials
+   - - http://time2hack.com/2015/03/intro-to-firebase-with-javascript-and-jquery.html
     - https://www.codecademy.com/en/tracks/firebase
     - https://www.airpair.com/firebase/posts/firebase-building-realtime-app
     - http://thejackalofjavascript.com/getting-started-with-firebase/
     - https://www.firebase.com/tutorial/#session/f5ivinhiynt  
-    - http://time2hack.com/2015/03/intro-to-firebase-with-javascript-and-jquery.html
-    - https://www.firebase.com/blog/2014-04-28-best-practices-arrays-in-firebase.html
-  - Save new scores to firebase
-  - Call scores from firebase
+  <!-- - Save records to firebase DB on game end -->
+  - Remove old database structure
+  - Get records and update leaderboard on game end  
+    - Get records
+    - Rank records by difficulty && score
+    - Write to HTML
+    - Set up authentication
+
+  - On game load
+    - Get scores from firebase, add to local container array
+  - On game end
+    - add new score to firebase
+    - then, add new score to local container array
+    - then, sort local container array
+    - then, write to HTML
+
 
 
 - Finish setting up game difficulty variables
-  - Set up superbug
+  - Set up superbug attributes
 
 - Add game instructions
 
