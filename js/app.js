@@ -42,7 +42,8 @@ var Game = {
   },
   "addNewScore": function(){
 
-    console.log("new player added to local variable");
+    // Detach firebase listener
+    Game.playersRef.off();
 
     // Add score to local array
     Game.leaderboardsArray.push([this.difficulty, this.score, player.username]);
@@ -51,8 +52,6 @@ var Game = {
     Game.leaderboardsArray.sort(function(a,b){
       return b[1] - a[1];
     });
-
-    console.log("sorted games array", Game.leaderboardsArray);
 
     // Don't call prior to game ending state; otherwise, properties will not be populated.
     // Add score to firebase
