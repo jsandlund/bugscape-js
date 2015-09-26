@@ -6,12 +6,14 @@ var Game = {
   "timeUp": false,
   "livesOut": false,
   "playersRef": {},
+  "difficulty": "easy",
+  "state": "state_createGame",
   "difficultySettings": {
     "easy": {
       "numEnemies": 4,
       "enemySpeedMultiplier": 1,
       "oddsOfSuperEnemy": .05,
-      "playerLives": 10
+      "playerLives": 5
     },
     "medium": {
       "numEnemies": 7,
@@ -23,7 +25,7 @@ var Game = {
       "numEnemies": 10,
       "enemySpeedMultiplier": 3,
       "oddsOfSuperEnemy": .20,
-      "playerLives": 2
+      "playerLives": 5
     }
   },
   "leaderboardsArray": [], // to hold all players in a nested array [difficulty, score, username]
@@ -67,15 +69,16 @@ var Game = {
         newEntry = [username, score],
         leaderboards = this.leaderboards,
         difficulty = this.difficulty,
-        elLeaderboards = document.getElementById('leaderboards-container'),
-        maxLeaderboardEntries = 2
+        elLeaderboards = document.getElementById('leaderboards-container');
 
     // Build <ol> for each difficulty level
     for (difficulty in Game.difficultySettings) {
       elLeaderboards.innerHTML +=
         '<div class="col-md-4">' +
-          '<h3 class="text-center">' + difficulty + '</h3>' +
-          '<ol id="board-' + difficulty + '">' + '</ol>' +
+          '<div class="panel panel-primary">' +
+            '<div class="panel-heading"><h3 class="text-center">' + difficulty + '</h3></div>' +
+            '<div class="panel-body"> <ol id="board-' + difficulty + '">' + '</ol> </div>' +
+          '</div>' +
         '</div>'
     };
 
@@ -92,11 +95,10 @@ var Game = {
         document.getElementById("board-" + playerDifficulty).innerHTML += playerEntryHTML
     };
   },
-  "difficulty": "easy",
-  "state": "state_createGame",
   "gameTimer": new Timer(5, 1000, "elTime"), // length of timer, ms interval, ID of element to update
   "initStateFunctions": {
     "state_createGame": function(){
+
       // handle form submissions
       $("#createGame").submit(function(e) {
         // get username and difficulty
@@ -106,18 +108,16 @@ var Game = {
         Game.difficulty = form.difficulty.value;
         // start game
         Game.changeState("state_playGame");
-      })
+      });
 
-      // Get scores from firebase
+      // Get scores from firebase on game start; this ensures they're finished loading by game end.
       Game.getScoresFromFirebase();
     },
     "state_playGame": function(){
-
       // Instantiate Enemy objects, place in global allEnemies array
       for (var i = 0; i < Game.difficultySettings[Game.difficulty].numEnemies; i++) {
         allEnemies.push(new Enemy());
-      }
-
+      };
       // Initiate Player
       player.initiate();
 
@@ -126,11 +126,11 @@ var Game = {
       $("#elLives").text(player.lives);
       $("#view-playGame").toggleClass("hidden-xs-up");
 
-      // Start game timer. [QUESTION]: is there a way to refernce the Game object by climbing the `this` chain? Using just this references the `initStateFunctions`
-      Game.gameTimer.run();
       // start GameEngine
       Engine(window);
 
+      // Start game timer. [QUESTION]: is there a way to refernce the Game object by climbing the `this` chain? Using just this references the `initStateFunctions`
+      Game.gameTimer.run();
     },
     "state_endGame": function(){
       var msg,
@@ -147,6 +147,16 @@ var Game = {
       $("#view-endGame").toggleClass("hidden-xs-up");
 
       // create end game message, write to html
+      if (Game.score > 0) {
+        msg = '<div class="alert alert-dismissible alert-success"> <button type="button" class="close" data-dismiss="alert">×</button> +
+                '<strong>Well done!</strong> You successfully read <a href="#" class="alert-link">this important alert message</a>'
+              </div>'
+
+        // '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>'
+      }
+
+
+
       msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>'
       elMsg = document.getElementById('endGameMsg')
       elMsg.innerHTML = msg;
@@ -154,11 +164,10 @@ var Game = {
   },
   "changeState": function(newState){
     console.log("State changed to: ", newState);
+    // Call new states init function
     this.initStateFunctions[newState]();
+    // Set local state to new state
     this.state = newState;
-  },
-  "displayScore": function() {
-    console.log("Your score is now: " + this.score)
   },
   "updateScore": function(pointChange){
     var elScore = document.getElementById("elScore");
@@ -181,7 +190,7 @@ var Game = {
     }
   },
   "isGameOver": function(){
-    if (this.timeUp || this.livesOut) {return true} else { return false};
+    if (this.timeUp || this.livesOut) { return true } else { return false };
   }
 }
 
@@ -318,6 +327,13 @@ function Timer(secs, msInterval, elemToUpdate){
 
     function updateTimer(){
       element.innerHTML = scope.secs;
+
+      // Change timer to warning state when less than 10 seconds left.
+      if(scope.secs === 10){
+        $("#elTimeListItem").addClass("text-danger")
+      }
+
+      // Change state of game when timer hits 0
       if (scope.secs < 1) {
         // stop setInterval
         clearTimeout(timer);

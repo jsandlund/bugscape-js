@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Effective JavaScript: Frogger</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-GHW2S7IZAQe8+YkyL99LyDj1zdWXSPOG+JZafCtKiSc= sha512-vxM32w6T7zJ83xOQ6FT4CEFnlasqmkcB0+ojgbI0N6ZtSxYvHmT7sX2icN07TqEqr5wdKwoLkmB8sAsGAjCJHg==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://bootswatch.com/superhero/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
@@ -15,17 +16,16 @@
 
     <!-- View 1 - New Game -->
     <div id="view-createGame" class="row">
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-8 col-md-offset-2">
+
+      <div class="page-header">
+        <h1 class="text-center"> <i class="fa fa-bug"></i> Bugscape JS</h1>
+        <ul class="list-inline text-center">
+          <li> <i class="fa fa-question-circle"></i> How to Play </li>
+        </ul>
+      </div>
 
       <div class="card">
-        <div class="card-header">
-          <h2 class="card-title"> <i class="fa fa-bug"></i> Bugscape JS</h2>
-          <ul class="list-inline text-center">
-            <li> <i class="fa fa-question-circle"></i> How to Play </li>
-            <li> <i class="fa fa-users"></i> Leaderboard  </li>
-          </ul>
-        </div>
-
         <div class="card-block form-create-game">
           <form id="createGame">
             <fieldset class="form-group">
@@ -40,7 +40,7 @@
                 <option>hard</option>
               </select>
             </fieldset>
-            <button type="submit" class="btn btn-success-outline btn-block">Let's Do This!</button>
+            <button type="submit" class="btn btn-block btn-primary btn-lg">Let's Play!</button>
           </form>
         </div>
       </div>
@@ -49,33 +49,32 @@
 
   <!-- View 2 - Play Game -->
   <div id="view-playGame" class="row hidden-xs-up">
-  <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
 
-    <div class="card">
-      <div class="card-header">
-        <i class="fa fa-bug logo"></i>
-        <ul class='list-inline text-center'>
-          <li><i class="fa fa-clock-o"></i> <span id="elTime"> <!-- set by JS --> </span> <small> seconds to go </small> </li>
-          <li><i class="fa fa-heart"></i> <span id="elLives"> 5 </span> <small> lives </small> </li>
-          <li><i class="fa fa-star"></i> <span id="elScore"> 0 </span> <small> points </small>  </li>
-        </ul>
-      </div>
-
-      <div class="card-block">
-        <div id="game-container"></div> <!-- game loads here -->
+          <ul class='nav nav-justified game-controls'>
+            <li class=""><i class="fa fa-heart"></i> <span id="elLives"> 5 </span> <small> lives </small> </li>
+            <li class="text-success"><i class="fa fa-star"></i> <span id="elScore"> 0 </span> <small> points </small>  </li>
+            <li id="elTimeListItem"><i class="fa fa-clock-o"></i> <span id="elTime"> <!-- set by JS --> </span> </li>
+          </ul>
+        </div>
       </div>
     </div>
+
+    <div id="game-container">
+      <!-- game loads here -->
+    </div>
   </div>
-  </div>
+
 
   <!-- View 3 - End Game -->
   <div id="view-endGame" class="row hidden-xs-up">
-  <div class="col-md-6 col-md-offset-3">
+  <div class="">
 
     <div class="card">
 
       <div class="card-header">
-        <i class="fa fa-bug logo"></i>
         <h2 class="card-title">Game over</h2>
       </div>
 
@@ -84,7 +83,8 @@
       </div>
 
       <div id="leaderboards" class="card-block">
-          <h2> All Time Leaderboards </h2>
+          <h2 class="text-center"> All Time Leaderboards </h2>
+          <hr>
           <div id="leaderboards-container" class="row">
             <!-- leaderboards here  -->
           </div>
