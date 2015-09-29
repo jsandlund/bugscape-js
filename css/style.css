@@ -1,8 +1,6 @@
 /*
-
-THEME: Bootswatch Superhero
+BASE THEME: Bootswatch Superhero
 LINK: https://bootswatch.com/superhero/
-
 */
 
 #site-wrapper {
@@ -29,10 +27,9 @@ canvas {
   background-color:inherit;
 }
 
-
 /* Leaderboard Styles */
 
-.leaderboard-score{
+.leaderboard-score {
   font-weight:600;
 }
 
@@ -41,13 +38,14 @@ ul.game-controls {
   text-align:center;
 }
 
-
 /* Typography */
-
 .page-header h1 {
     font-size: 4em;
 }
 
 label, .radio label, .checkbox label, .help-block {
   font-size:14px;
+}
+.leaderboard-container, select#difficulty {
+  text-transform: capitalize;
 }
