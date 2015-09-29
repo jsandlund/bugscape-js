@@ -17,19 +17,16 @@ var Game = {
     "easy": {
       "numEnemies": 4,
       "enemySpeedMultiplier": 1,
-      "oddsOfSuperEnemy": .05,
       "playerLives": 5
     },
     "medium": {
       "numEnemies": 7,
       "enemySpeedMultiplier": 2,
-      "oddsOfSuperEnemy": .10,
       "playerLives": 5
     },
     "hard": {
       "numEnemies": 10,
       "enemySpeedMultiplier": 3,
-      "oddsOfSuperEnemy": .20,
       "playerLives": 5
     }
   },
@@ -53,12 +50,13 @@ var Game = {
     // Add score to local array
     Game.leaderboards[this.difficulty].push([this.score, player.username]);
 
+
     // Sort scores for all leaderboards
-    for (board in Game.leaderboards) {
+    for (var board in Game.leaderboards) {
       Game.leaderboards[board].sort(function(a, b) {
         return b[0] - a[0];
       });
-    };
+    }
 
     // Don't call prior to game ending state; otherwise, properties will not be populated.
     // Add score to firebase
@@ -85,11 +83,11 @@ var Game = {
         '<div class="panel-heading"><h3 class="text-center">' + difficulty + '</h3></div>' +
         '<div class="panel-body"> <ol id="board-' + difficulty + '">' + '</ol> </div>' +
         '</div>' +
-        '</div>'
-    };
+        '</div>';
+    }
 
     // append players <ol>'
-    for (board in Game.leaderboards) {
+    for (var board in Game.leaderboards) {
       var sortedBoardArray = Game.leaderboards[board];
       var numEntries = Math.min(sortedBoardArray.length, maxLeaderboardEntries);
 
@@ -102,9 +100,9 @@ var Game = {
           '<li>' +
           '<span class="leaderboard-score">' + playerScore + '</span>' + ' ' + '<span class="leaderboard-username">' + playerUsername + '</span>' +
           '</li>';
-        document.getElementById("board-" + playerDifficulty).innerHTML += playerEntryHTML
-      };
-    };
+        document.getElementById("board-" + playerDifficulty).innerHTML += playerEntryHTML;
+      }
+    }
   },
   "gameTimer": new Timer(30, 1000, "elTime"), // length of timer, ms interval, ID of element to update
   "initStateFunctions": {
@@ -128,7 +126,7 @@ var Game = {
       // Instantiate Enemy objects, place in global allEnemies array
       for (var i = 0; i < Game.difficultySettings[Game.difficulty].numEnemies; i++) {
         allEnemies.push(new Enemy());
-      };
+      }
       // Initiate Player
       player.initiate();
 
@@ -159,11 +157,11 @@ var Game = {
 
       // create end game message, write to html
       if (Game.score > 0) {
-        msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>'
+        msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>';
       }
 
-      msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>'
-      elMsg = document.getElementById('endGameMsg')
+      msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>';
+      elMsg = document.getElementById('endGameMsg');
       elMsg.innerHTML = msg;
     }
   },
@@ -177,7 +175,7 @@ var Game = {
   },
   "updateScore": function(pointChange) {
     var elScore = document.getElementById("elScore");
-    this.score = this.score + pointChange
+    this.score = this.score + pointChange;
     elScore.innerHTML = this.score;
     player.resetPosition();
   },
@@ -190,12 +188,12 @@ var Game = {
           player.updateLives(-1);
         } else {
           Game.changeState('state_endGame');
-        };
+        }
         player.resetPosition();
       }
     }
   }
-}
+};
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -213,7 +211,7 @@ var Enemy = function() {
   this.resetPosition = function() {
     this.x = -20;
     this.y = this.yBase + (Math.floor((Math.random() * 3)) * this.yInterval);
-  }
+  };
 };
 
 // Update the enemy's position, required method for game
@@ -238,63 +236,63 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 
 var Player = function() {
-  this.sprite = 'images/char-boy.png'
+  this.sprite = 'images/char-boy.png';
   this.x = 200;
   this.y = 385;
   this.moveY = 85;
   this.moveX = 100;
   this.points = 0;
-}
+};
 
 Player.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 Player.prototype.updateLives = function(livesChange) {
   this.lives = this.lives + livesChange;
   $("#elLives").text(this.lives);
-}
+};
 
 Player.prototype.handleInput = function(keyPressed) {
 
   switch (keyPressed) {
     case "left":
       if (this.x !== 0) {
-        this.x = this.x - this.moveX
-      };
+        this.x = this.x - this.moveX;
+      }
       break;
     case "right":
       if (this.x < 400) {
-        this.x = this.x + this.moveX
-      };
+        this.x = this.x + this.moveX;
+      }
       break;
     case "up":
       if (this.y === 45) {
         Game.updateScore(1);
       } else {
-        this.y = this.y - this.moveY
-      };
+        this.y = this.y - this.moveY;
+      }
       break;
     case "down":
       if (this.y < 385) {
-        this.y = this.y + this.moveY
-      };
+        this.y = this.y + this.moveY;
+      }
       break;
   }
-}
+};
 
 Player.prototype.initiate = function() {
   // set lives
   this.lives = Game.difficultySettings[Game.difficulty].playerLives;
   console.log(this.username + " has " + this.lives + " lives!");
-}
+};
 
-Player.prototype.update = function(dt) {}
+Player.prototype.update = function(dt) {};
 
 Player.prototype.resetPosition = function() {
   this.x = 200;
   this.y = 385;
-}
+};
 
 
 // Place all enemy objects in an array called allEnemies
@@ -331,15 +329,15 @@ function Timer(secs, msInterval, elemToUpdate) {
     element.innerHTML = this.secs;
 
     // set `this` to local scope variable to prevent setInterval from referencing global window object.
-    var scope = this
-    var timer = setInterval(updateTimer, this.msInterval, this.element, scope)
+    var scope = this;
+    var timer = setInterval(updateTimer, this.msInterval, this.element, scope);
 
     function updateTimer() {
       element.innerHTML = scope.secs;
 
       // Change timer to warning state when less than 10 seconds left.
       if (scope.secs === 10) {
-        $("#elTimeListItem").addClass("text-danger")
+        $("#elTimeListItem").addClass("text-danger");
       }
 
       // Change state of game when timer hits 0
@@ -351,5 +349,5 @@ function Timer(secs, msInterval, elemToUpdate) {
       }
       scope.secs--;
     }
-  }
+};
 }
