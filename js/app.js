@@ -17,17 +17,17 @@ var Game = {
     "easy": {
       "numEnemies": 4,
       "enemySpeedMultiplier": 1,
-      "playerLives": 5
+      "playerLives": 3
     },
     "medium": {
       "numEnemies": 7,
       "enemySpeedMultiplier": 2,
-      "playerLives": 5
+      "playerLives": 3
     },
     "hard": {
       "numEnemies": 10,
       "enemySpeedMultiplier": 3,
-      "playerLives": 5
+      "playerLives": 3
     }
   },
   "leaderboardsArray": [], // to hold all players in a nested array [difficulty, score, username]
