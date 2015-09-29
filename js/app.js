@@ -8,6 +8,11 @@ var Game = {
   "playersRef": {},
   "difficulty": "easy",
   "state": "state_createGame",
+  "leaderboards": {
+    "easy": [],
+    "medium": [],
+    "hard": []
+  },
   "difficultySettings": {
     "easy": {
       "numEnemies": 4,
@@ -37,10 +42,8 @@ var Game = {
     // get sorted scores from Firebase.
     Game.playersRef.orderByChild("score").on("child_added", function(snapshot){
       var result = snapshot.val();
-      Game.leaderboardsArray.push([result.difficulty, result.score, result.username]);
-      console.log("new player added to firebase");
+      Game.leaderboards[result.difficulty].push([result.score, result.username]);
     });
-
   },
   "addNewScore": function(){
 
@@ -48,12 +51,14 @@ var Game = {
     Game.playersRef.off();
 
     // Add score to local array
-    Game.leaderboardsArray.push([this.difficulty, this.score, player.username]);
+    Game.leaderboards[this.difficulty].push([this.score, player.username]);
 
-    // Sort scores
-    Game.leaderboardsArray.sort(function(a,b){
-      return b[1] - a[1];
-    });
+    // Sort scores for all leaderboards
+    for (board in Game.leaderboards){
+      Game.leaderboards[board].sort(function(a,b){
+        return b[0] - a[0];
+      });
+    };
 
     // Don't call prior to game ending state; otherwise, properties will not be populated.
     // Add score to firebase
@@ -69,7 +74,8 @@ var Game = {
         newEntry = [username, score],
         leaderboards = this.leaderboards,
         difficulty = this.difficulty,
-        elLeaderboards = document.getElementById('leaderboards-container');
+        elLeaderboards = document.getElementById('leaderboards-container'),
+        maxLeaderboardEntries = 10;
 
     // Build <ol> for each difficulty level
     for (difficulty in Game.difficultySettings) {
@@ -83,19 +89,24 @@ var Game = {
     };
 
     // append players <ol>'
-    for (var i = 0; i < Game.leaderboardsArray.length; i++){
-      var _player = Game.leaderboardsArray[i],
-          playerDifficulty = _player[0],
-          playerScore = _player[1],
-          playerUsername = _player[2],
-          playerEntryHTML =
-          '<li>' +
-            '<span class="leaderboard-score">' + playerScore + '</span>' + ' ' + '<span class="leaderboard-username">' + playerUsername + '</span>' +
-          '</li>';
-        document.getElementById("board-" + playerDifficulty).innerHTML += playerEntryHTML
+    for (board in Game.leaderboards) {
+      var sortedBoardArray = Game.leaderboards[board];
+      var numEntries = Math.min(sortedBoardArray.length, maxLeaderboardEntries);
+
+      for (var i = 0; i < numEntries; i++) {
+        var _player = sortedBoardArray[i],
+            playerDifficulty = board,
+            playerScore = _player[0],
+            playerUsername = _player[1],
+            playerEntryHTML =
+            '<li>' +
+              '<span class="leaderboard-score">' + playerScore + '</span>' + ' ' + '<span class="leaderboard-username">' + playerUsername + '</span>' +
+            '</li>';
+          document.getElementById("board-" + playerDifficulty).innerHTML += playerEntryHTML
+      };
     };
   },
-  "gameTimer": new Timer(5, 1000, "elTime"), // length of timer, ms interval, ID of element to update
+  "gameTimer": new Timer(2, 1000, "elTime"), // length of timer, ms interval, ID of element to update
   "initStateFunctions": {
     "state_createGame": function(){
 
@@ -148,11 +159,7 @@ var Game = {
 
       // create end game message, write to html
       if (Game.score > 0) {
-        msg = '<div class="alert alert-dismissible alert-success"> <button type="button" class="close" data-dismiss="alert">×</button> +
-                '<strong>Well done!</strong> You successfully read <a href="#" class="alert-link">this important alert message</a>'
-              </div>'
-
-        // '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>'
+        msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>'
       }
 
 
