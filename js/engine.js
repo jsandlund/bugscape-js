@@ -26,8 +26,8 @@ var Engine = function(global) {
         $gameContainer = $('#game-container'),
         lastTime;
 
-    canvas.width = Game.width;
-    canvas.height = Game.height;
+    canvas.width = Game.WIDTH;
+    canvas.height = Game.HEIGHT;
     $gameContainer.append(canvas);
 
     /* This function serves as the kickoff point for the game loop itself

@@ -1,13 +1,14 @@
 // Create Game object to hold game settings
 var Game = {
-  "height": 606,
+  "HEIGHT": 606,
+  "WIDTH": 505,
+  "self": this,
   "score": 0,
   "timeUp": false,
   "livesOut": false,
   "playersRef": {},
   "difficulty": "easy",
   "state": "state_createGame",
-  "width": 505,
   "leaderboards": {
     "easy": [],
     "medium": [],
@@ -34,33 +35,33 @@ var Game = {
   "getScoresFromFirebase": function() {
 
     // Call on game load, so there is no delay when leaderboards are populated.
-    Game.playersRef = new Firebase('https://bugscape-js.firebaseio.com/players');
+    self.playersRef = new Firebase('https://bugscape-js.firebaseio.com/players');
 
     // get sorted scores from Firebase.
-    Game.playersRef.orderByChild("score").on("child_added", function(snapshot) {
+    self.playersRef.orderByChild("score").on("child_added", function(snapshot) {
       var result = snapshot.val();
-      Game.leaderboards[result.difficulty].push([result.score, result.username]);
+      self.leaderboards[result.difficulty].push([result.score, result.username]);
     });
   },
   "addNewScore": function() {
 
     // Detach firebase listener
-    Game.playersRef.off();
+    self.playersRef.off();
 
     // Add score to local array
-    Game.leaderboards[this.difficulty].push([this.score, player.username]);
+    self.leaderboards[this.difficulty].push([this.score, player.username]);
 
 
     // Sort scores for all leaderboards
-    for (var board in Game.leaderboards) {
-      Game.leaderboards[board].sort(function(a, b) {
+    for (var board in self.leaderboards) {
+      self.leaderboards[board].sort(function(a, b) {
         return b[0] - a[0];
       });
     }
 
     // Don't call prior to game ending state; otherwise, properties will not be populated.
     // Add score to firebase
-    Game.playersRef.push({
+    self.playersRef.push({
       "username": player.username,
       "score": this.score,
       "difficulty": this.difficulty
@@ -76,7 +77,7 @@ var Game = {
       maxLeaderboardEntries = 10;
 
     // Build <ol> for each difficulty level
-    for (difficulty in Game.difficultySettings) {
+    for (difficulty in self.difficultySettings) {
       elLeaderboards.innerHTML +=
         '<div class="col-md-4 leaderboard-container">' +
         '<div class="panel panel-primary">' +
@@ -87,8 +88,8 @@ var Game = {
     }
 
     // append players <ol>'
-    for (var board in Game.leaderboards) {
-      var sortedBoardArray = Game.leaderboards[board];
+    for (var board in self.leaderboards) {
+      var sortedBoardArray = self.leaderboards[board];
       var numEntries = Math.min(sortedBoardArray.length, maxLeaderboardEntries);
 
       for (var i = 0; i < numEntries; i++) {
@@ -114,17 +115,17 @@ var Game = {
         var form = this;
         e.preventDefault();
         player.username = form.username.value;
-        Game.difficulty = form.difficulty.value;
+        self.difficulty = form.difficulty.value;
         // start game
-        Game.changeState("state_playGame");
+        self.changeState("state_playGame");
       });
 
       // Get scores from firebase on game start; this ensures they're finished loading by game end.
-      Game.getScoresFromFirebase();
+      self.getScoresFromFirebase();
     },
     "state_playGame": function() {
       // Instantiate Enemy objects, place in global allEnemies array
-      for (var i = 0; i < Game.difficultySettings[Game.difficulty].numEnemies; i++) {
+      for (var i = 0; i < self.difficultySettings[self.difficulty].numEnemies; i++) {
         allEnemies.push(new Enemy());
       }
       // Initiate Player
@@ -139,28 +140,28 @@ var Game = {
       Engine(window);
 
       // Start game timer. [QUESTION]: is there a way to refernce the Game object by climbing the `this` chain? Using just this references the `initStateFunctions`
-      Game.gameTimer.run();
+      self.gameTimer.run();
     },
     "state_endGame": function() {
       var msg,
         elMsg;
 
       // Add new score to DB
-      Game.addNewScore();
+      self.addNewScore();
 
       // Write scores to HTML
-      Game.buildLeaderboardsHTML();
+      self.buildLeaderboardsHTML();
 
       // hide view2, show view3
       $("#view-playGame").toggleClass("hidden-xs-up");
       $("#view-endGame").toggleClass("hidden-xs-up");
 
       // create end game message, write to html
-      if (Game.score > 0) {
-        msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>';
+      if (self.score > 0) {
+        msg = '<p class="text-center">' + 'You scored ' + self.score + ' points!' + '</p>';
       }
 
-      msg = '<p class="text-center">' + 'You scored ' + Game.score + ' points!' + '</p>';
+      msg = '<p class="text-center">' + 'You scored ' + self.score + ' points!' + '</p>';
       elMsg = document.getElementById('endGameMsg');
       elMsg.innerHTML = msg;
     }
@@ -187,11 +188,97 @@ var Game = {
         if (player.lives > 1) {
           player.updateLives(-1);
         } else {
-          Game.changeState('state_endGame');
+          self.changeState('state_endGame');
         }
         player.resetPosition();
       }
     }
+  }
+};
+
+// Enemies our player must avoid
+var Enemy = function() {
+  // Variables applied to each of our instances go here,
+  // we've provided one for you to get started
+
+  // The image/sprite for our enemies, this uses
+  // a helper we've provided to easily load images
+  this.sprite = 'images/enemy-bug.png';
+  this.x = 1;
+  this.yBase = 60;
+  this.yInterval = 80;
+  this.y = this.yBase + (Math.floor((Math.random() * 3)) * this.yInterval); // get random number between 1 - 3; multiply by pixels to determine starting row of enemy
+  this.speed = 100 + Math.floor((Math.random() * 200) + 1);
+  this.resetPosition = function() {
+    this.x = -20;
+    this.y = this.yBase + (Math.floor((Math.random() * 3)) * this.yInterval);
+  };
+};
+
+// Update the enemy's position, required method for game
+// Parameter: dt, a time delta between ticks
+Enemy.prototype.update = function(dt) {
+  // You should multiply any movement by the dt parameter
+  // which will ensure the game runs at the same speed for
+  // all computers.
+  this.x = this.x + this.speed * dt;
+  if (this.x > self.width) {
+    this.resetPosition();
+  }
+};
+
+// Draw the enemy on the screen, required method for game
+Enemy.prototype.render = function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+// Now write your own player class
+// This class requires an update(), render() and
+// a handleInput() method.
+
+var Player = function() {
+  this.sprite = 'images/char-boy.png';
+  this.x = 200;
+  this.y = 385;
+  this.moveY = 85;
+  this.moveX = 100;
+  this.points = 0;
+};
+
+Player.prototype.render = function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+Player.prototype.updateLives = function(livesChange) {
+  this.lives = this.lives + livesChange;
+  $("#elLives").text(this.lives);
+};
+
+Player.prototype.handleInput = function(keyPressed) {
+
+  switch (keyPressed) {
+    case "left":
+      if (this.x !== 0) {
+        this.x = this.x - this.moveX;
+      }
+      break;
+    case "right":
+      if (this.x < 400) {
+        this.x = this.x + this.moveX;
+      }
+      break;
+    case "up":
+      if (this.y === 45) {
+        self.updateScore(1);
+      } else {
+        this.y = this.y - this.moveY;
+      }
+      break;
+    case "down":
+      if (this.y < 385) {
+        this.y = this.y + this.moveY;
+      }
+      break;
   }
 };
 
