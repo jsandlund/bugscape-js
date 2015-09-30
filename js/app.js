@@ -35,33 +35,33 @@ var Game = {
   "getScoresFromFirebase": function() {
 
     // Call on game load, so there is no delay when leaderboards are populated.
-    self.playersRef = new Firebase('https://bugscape-js.firebaseio.com/players');
+    this.playersRef = new Firebase('https://bugscape-js.firebaseio.com/players');
 
     // get sorted scores from Firebase.
-    self.playersRef.orderByChild("score").on("child_added", function(snapshot) {
+    this.playersRef.orderByChild("score").on("child_added", function(snapshot) {
       var result = snapshot.val();
-      self.leaderboards[result.difficulty].push([result.score, result.username]);
+      this.leaderboards[result.difficulty].push([result.score, result.username]);
     });
   },
   "addNewScore": function() {
 
     // Detach firebase listener
-    self.playersRef.off();
+    this.playersRef.off();
 
     // Add score to local array
-    self.leaderboards[this.difficulty].push([this.score, player.username]);
+    this.leaderboards[this.difficulty].push([this.score, player.username]);
 
 
     // Sort scores for all leaderboards
-    for (var board in self.leaderboards) {
-      self.leaderboards[board].sort(function(a, b) {
+    for (var board in this.leaderboards) {
+      this.leaderboards[board].sort(function(a, b) {
         return b[0] - a[0];
       });
     }
 
     // Don't call prior to game ending state; otherwise, properties will not be populated.
     // Add score to firebase
-    self.playersRef.push({
+    this.playersRef.push({
       "username": player.username,
       "score": this.score,
       "difficulty": this.difficulty
@@ -77,7 +77,7 @@ var Game = {
       maxLeaderboardEntries = 10;
 
     // Build <ol> for each difficulty level
-    for (difficulty in self.difficultySettings) {
+    for (difficulty in this.difficultySettings) {
       elLeaderboards.innerHTML +=
         '<div class="col-md-4 leaderboard-container">' +
         '<div class="panel panel-primary">' +
@@ -88,8 +88,8 @@ var Game = {
     }
 
     // append players <ol>'
-    for (var board in self.leaderboards) {
-      var sortedBoardArray = self.leaderboards[board];
+    for (var board in this.leaderboards) {
+      var sortedBoardArray = this.leaderboards[board];
       var numEntries = Math.min(sortedBoardArray.length, maxLeaderboardEntries);
 
       for (var i = 0; i < numEntries; i++) {
@@ -115,17 +115,17 @@ var Game = {
         var form = this;
         e.preventDefault();
         player.username = form.username.value;
-        self.difficulty = form.difficulty.value;
+        this.difficulty = form.difficulty.value;
         // start game
-        self.changeState("state_playGame");
+        this.changeState("state_playGame");
       });
 
       // Get scores from firebase on game start; this ensures they're finished loading by game end.
-      self.getScoresFromFirebase();
+      this.getScoresFromFirebase();
     },
     "state_playGame": function() {
       // Instantiate Enemy objects, place in global allEnemies array
-      for (var i = 0; i < self.difficultySettings[self.difficulty].numEnemies; i++) {
+      for (var i = 0; i < this.difficultySettings[this.difficulty].numEnemies; i++) {
         allEnemies.push(new Enemy());
       }
       // Initiate Player
@@ -140,28 +140,28 @@ var Game = {
       Engine(window);
 
       // Start game timer. [QUESTION]: is there a way to refernce the Game object by climbing the `this` chain? Using just this references the `initStateFunctions`
-      self.gameTimer.run();
+      this.gameTimer.run();
     },
     "state_endGame": function() {
       var msg,
         elMsg;
 
       // Add new score to DB
-      self.addNewScore();
+      this.addNewScore();
 
       // Write scores to HTML
-      self.buildLeaderboardsHTML();
+      this.buildLeaderboardsHTML();
 
       // hide view2, show view3
       $("#view-playGame").toggleClass("hidden-xs-up");
       $("#view-endGame").toggleClass("hidden-xs-up");
 
       // create end game message, write to html
-      if (self.score > 0) {
-        msg = '<p class="text-center">' + 'You scored ' + self.score + ' points!' + '</p>';
+      if (this.score > 0) {
+        msg = '<p class="text-center">' + 'You scored ' + this.score + ' points!' + '</p>';
       }
 
-      msg = '<p class="text-center">' + 'You scored ' + self.score + ' points!' + '</p>';
+      msg = '<p class="text-center">' + 'You scored ' + this.score + ' points!' + '</p>';
       elMsg = document.getElementById('endGameMsg');
       elMsg.innerHTML = msg;
     }
@@ -188,7 +188,7 @@ var Game = {
         if (player.lives > 1) {
           player.updateLives(-1);
         } else {
-          self.changeState('state_endGame');
+          this.changeState('state_endGame');
         }
         player.resetPosition();
       }
