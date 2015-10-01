@@ -2,7 +2,6 @@
 var Game = {
   "HEIGHT": 606,
   "WIDTH": 505,
-  "self": this,
   "score": 0,
   "timeUp": false,
   "livesOut": false,
@@ -34,13 +33,15 @@ var Game = {
   "leaderboardsArray": [], // to hold all players in a nested array [difficulty, score, username]
   "getScoresFromFirebase": function() {
 
+    var self = this;
+
     // Call on game load, so there is no delay when leaderboards are populated.
     this.playersRef = new Firebase('https://bugscape-js.firebaseio.com/players');
 
     // get sorted scores from Firebase.
     this.playersRef.orderByChild("score").on("child_added", function(snapshot) {
       var result = snapshot.val();
-      this.leaderboards[result.difficulty].push([result.score, result.username]);
+      self.leaderboards[result.difficulty].push([result.score, result.username]);
     });
   },
   "addNewScore": function() {
@@ -108,24 +109,30 @@ var Game = {
   "gameTimer": new Timer(30, 1000, "elTime"), // length of timer, ms interval, ID of element to update
   "initStateFunctions": {
     "state_createGame": function() {
+      var self = Game;
 
       // handle form submissions
       $("#createGame").submit(function(e) {
+        e.preventDefault();
+
         // get username and difficulty
         var form = this;
-        e.preventDefault();
         player.username = form.username.value;
-        this.difficulty = form.difficulty.value;
+        self.difficulty = form.difficulty.value;
+
         // start game
-        this.changeState("state_playGame");
+        self.changeState("state_playGame");
       });
 
       // Get scores from firebase on game start; this ensures they're finished loading by game end.
-      this.getScoresFromFirebase();
+      self.getScoresFromFirebase();
     },
     "state_playGame": function() {
+
+      var self = Game;
+
       // Instantiate Enemy objects, place in global allEnemies array
-      for (var i = 0; i < this.difficultySettings[this.difficulty].numEnemies; i++) {
+      for (var i = 0; i < self.difficultySettings[self.difficulty].numEnemies; i++) {
         allEnemies.push(new Enemy());
       }
       // Initiate Player
@@ -140,28 +147,31 @@ var Game = {
       Engine(window);
 
       // Start game timer. [QUESTION]: is there a way to refernce the Game object by climbing the `this` chain? Using just this references the `initStateFunctions`
-      this.gameTimer.run();
+      self.gameTimer.run();
     },
     "state_endGame": function() {
+
+     var self = Game;
+
       var msg,
         elMsg;
 
       // Add new score to DB
-      this.addNewScore();
+      self.addNewScore();
 
       // Write scores to HTML
-      this.buildLeaderboardsHTML();
+      self.buildLeaderboardsHTML();
 
       // hide view2, show view3
       $("#view-playGame").toggleClass("hidden-xs-up");
       $("#view-endGame").toggleClass("hidden-xs-up");
 
       // create end game message, write to html
-      if (this.score > 0) {
-        msg = '<p class="text-center">' + 'You scored ' + this.score + ' points!' + '</p>';
+      if (self.score > 0) {
+        msg = '<p class="text-center">' + 'You scored ' + self.score + ' points!' + '</p>';
       }
 
-      msg = '<p class="text-center">' + 'You scored ' + this.score + ' points!' + '</p>';
+      msg = '<p class="text-center">' + 'You scored ' + self.score + ' points!' + '</p>';
       elMsg = document.getElementById('endGameMsg');
       elMsg.innerHTML = msg;
     }
@@ -222,93 +232,7 @@ Enemy.prototype.update = function(dt) {
   // which will ensure the game runs at the same speed for
   // all computers.
   this.x = this.x + this.speed * dt;
-  if (this.x > self.width) {
-    this.resetPosition();
-  }
-};
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
-var Player = function() {
-  this.sprite = 'images/char-boy.png';
-  this.x = 200;
-  this.y = 385;
-  this.moveY = 85;
-  this.moveX = 100;
-  this.points = 0;
-};
-
-Player.prototype.render = function() {
-  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-Player.prototype.updateLives = function(livesChange) {
-  this.lives = this.lives + livesChange;
-  $("#elLives").text(this.lives);
-};
-
-Player.prototype.handleInput = function(keyPressed) {
-
-  switch (keyPressed) {
-    case "left":
-      if (this.x !== 0) {
-        this.x = this.x - this.moveX;
-      }
-      break;
-    case "right":
-      if (this.x < 400) {
-        this.x = this.x + this.moveX;
-      }
-      break;
-    case "up":
-      if (this.y === 45) {
-        self.updateScore(1);
-      } else {
-        this.y = this.y - this.moveY;
-      }
-      break;
-    case "down":
-      if (this.y < 385) {
-        this.y = this.y + this.moveY;
-      }
-      break;
-  }
-};
-
-// Enemies our player must avoid
-var Enemy = function() {
-  // Variables applied to each of our instances go here,
-  // we've provided one for you to get started
-
-  // The image/sprite for our enemies, this uses
-  // a helper we've provided to easily load images
-  this.sprite = 'images/enemy-bug.png';
-  this.x = 1;
-  this.yBase = 60;
-  this.yInterval = 80;
-  this.y = this.yBase + (Math.floor((Math.random() * 3)) * this.yInterval); // get random number between 1 - 3; multiply by pixels to determine starting row of enemy
-  this.speed = 100 + Math.floor((Math.random() * 200) + 1);
-  this.resetPosition = function() {
-    this.x = -20;
-    this.y = this.yBase + (Math.floor((Math.random() * 3)) * this.yInterval);
-  };
-};
-
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-  // You should multiply any movement by the dt parameter
-  // which will ensure the game runs at the same speed for
-  // all computers.
-  this.x = this.x + this.speed * dt;
-  if (this.x > Game.width) {
+  if (this.x > Game.WIDTH) {
     this.resetPosition();
   }
 };
@@ -367,6 +291,7 @@ Player.prototype.handleInput = function(keyPressed) {
       break;
   }
 };
+
 
 Player.prototype.initiate = function() {
   // set lives
