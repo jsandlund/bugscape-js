@@ -4,7 +4,7 @@ This is the 3rd project in Udacity's Frontend Web Developer Nanodegree curriculu
 
 I extended the scope of the project in two ways: (i) to include multiple difficulty levels; (ii) using firebase.io as a backend to power all-time leaderboards.
 
-Play 'Bugscape JS' online at [jsandlund.github.io/bugscape-js](http://jsandlund.github.io/bugscape-js/).
+Play 'Bugscape JS' online at [jsandlund.github.io/udacity-bugscapeJS.](jsandlund.github.io/udacity-bugscapeJS).
 
 ## Future Improvements
 
