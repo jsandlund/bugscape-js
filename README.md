@@ -1,4 +1,4 @@
-# Bugscape JS
+# Bugscape JS | http://jsandlund.github.io/udacity-bugscapeJS
 
 The 3rd project in Udacity's Frontend Web Developer Nanodegree curriculum, Bugscape JS intends to showcase a student's understanding of Object-Oriented JavaScript and HTML5 Canvas manipulation.
 
