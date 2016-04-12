@@ -1,8 +1,10 @@
-# Bugscape JS, by Jonathan Sandlund
+# Bugscape JS
 
-This is the 3rd project in Udacity's Frontend Web Developer Nanodegree curriculum. It intends to showcase a student's understanding of Object-Oriented JavaScript and HTML5 Canvas manipulation.
+The 3rd project in Udacity's Frontend Web Developer Nanodegree curriculum, Bugscape JS intends to showcase a student's understanding of Object-Oriented JavaScript and HTML5 Canvas manipulation.
 
-I extended the scope of the project in two ways: (i) to include multiple difficulty levels; (ii) using firebase.io as a backend to power all-time leaderboards.
+I extended the scope of the project in two ways: 
+1. Included multiple difficulty levels
+2. Used firebase.io as a JSON-based backend to power all-time leaderboards.
 
 Play 'Bugscape JS' online at [jsandlund.github.io/udacity-bugscapeJS.](jsandlund.github.io/udacity-bugscapeJS).
 
