@@ -6,7 +6,7 @@ I extended the scope of the project in two ways:
 1. Included multiple difficulty levels
 2. Used firebase.io as a JSON-based backend to power all-time leaderboards.
 
-Play 'Bugscape JS' online at [jsandlund.github.io/udacity-bugscapeJS.](jsandlund.github.io/udacity-bugscapeJS).
+Play 'Bugscape JS' online at [http://jsandlund.github.io/udacity-bugscapeJS](http://jsandlund.github.io/udacity-bugscapeJS)
 
 ## Future Improvements
 
